@@ -1,0 +1,8 @@
+APP_ID=yii2-start
+MODE=prod
+DB_HOST=postgresql
+DB_USER=user
+DB_PASSWORD=password
+DB_NAME=my_app
+DB_DATA_PATH=./runtime/db_data
+GITHUB_AUTH_TOKEN=personal_token

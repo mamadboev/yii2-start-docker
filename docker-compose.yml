@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  nginx:
+    container_name: ${APP_ID}-nginx-container
+    image: nginx:1.14
+    ports:
+      - 81:80
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/nginx-${MODE}.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - php
+
+  php:
+    container_name: ${APP_ID}-php-container
+    build:
+      context: ./docker/php-fpm
+      args:
+        GITHUB_AUTH_TOKEN: ${GITHUB_AUTH_TOKEN}
+    restart: always
+    volumes:
+      - ./:/var/www/html
+
+  db:
+    image: library/postgres:12-alpine
+    container_name: ${APP_ID}-postgresql
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - ${DB_DATA_PATH}:/var/lib/postgresql/data
+      - ./docker/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - 5433:5432
