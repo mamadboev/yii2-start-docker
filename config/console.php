@@ -1,7 +1,16 @@
 <?php
+use yii\console\controllers\MigrateController;
+use yii\helpers\ArrayHelper as ArrayHelperAlias;
 
-$params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
+$params = ArrayHelperAlias::merge(
+    require __DIR__ . '/params.php',
+    require __DIR__ . '/params-local.php'
+);
+
+$db = ArrayHelperAlias::merge(
+    require __DIR__ . '/db.php',
+    require __DIR__ . '/db-local.php'
+);
 
 $config = [
     'id' => 'basic-console',
@@ -28,13 +37,20 @@ $config = [
         'db' => $db,
     ],
     'params' => $params,
-    /*
+
     'controllerMap' => [
+        'migrate'=>[
+          'class' => MigrateController::class,
+          'migrationPath' =>[
+             // '@app/migrations',
+              '@app/modules/api/migrations',
+          ]
+        ],
         'fixture' => [ // Fixture generation command line.
             'class' => 'yii\faker\FixtureController',
         ],
     ],
-    */
+
 ];
 
 if (YII_ENV_DEV) {

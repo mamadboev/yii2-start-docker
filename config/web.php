@@ -1,11 +1,14 @@
 <?php
 
-$params =\yii\helpers\ArrayHelper::merge(
+use yii\base\BaseObject;
+use yii\helpers\ArrayHelper as ArrayHelperAlias;
+
+$params = ArrayHelperAlias::merge(
     require __DIR__ . '/params.php',
     require __DIR__ . '/params-local.php'
 );
 
-$db = \yii\helpers\ArrayHelper::merge(
+$db = ArrayHelperAlias::merge(
     require __DIR__ . '/db.php',
     require __DIR__ . '/db-local.php'
 ) ;
@@ -21,9 +24,12 @@ $config = [
     ],
     'components' => [
         'request' => [
-            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ],
             'cookieValidationKey' => '01531c336e3c569cb14353e8f9fdd1e5b47f7931',
         ],
+
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
@@ -51,14 +57,36 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
+
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        */
+        'response' => [
+                   'class' => yii\web\Response::class,
+                   'on beforeSend' => function ($event) {
+                                 $response = $event->sender;
+                                 if ($response->data !== null ) {
+                        $response->data = array(
+                        'success' => $response->isSuccessful,
+                        'data' =>  $response->isSuccessful ? $response->data : new BaseObject(),
+                        'error'=> $response->isSuccessful ? new BaseObject() : array(
+                            'code'=> $response->data['status'] ?? 0,
+                            'message' => $response->data['message'] ?? "unknown error",
+                        )
+                        );
+                    $response->statusCode = 200;
+                }
+            },
+        ]
+
+    ],
+    'modules' => [
+        'api' => [
+            'class' => 'app\modules\api\Module',
+        ],
     ],
     'params' => $params,
 ];
