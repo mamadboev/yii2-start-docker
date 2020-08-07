@@ -4,11 +4,12 @@
 namespace app\modules\api\controllers;
 
 
+use app\modules\api\models\Post;
 use app\modules\api\resources\PostResource;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 
-class PostController extends AuthController
+class PostController extends BaseController
 {
     public $serializer = [
         'class'=>'yii\rest\Serializer',
@@ -24,8 +25,6 @@ class PostController extends AuthController
 
             ]
         ];
-       // $parent['access']['only'] = ['index'];
-        $parent['access']['except'] = ['public'];
         return $parent;
     }
 
@@ -44,12 +43,6 @@ class PostController extends AuthController
                 'pagesize'=> $perPage,
             ]
         ]);
-    }
-    public function actionPublic(): array
-    {
-        return [
-          'ok'
-        ];
     }
 
 
